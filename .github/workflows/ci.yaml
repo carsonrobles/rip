@@ -1,0 +1,133 @@
+name: ci
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches: [ main ]
+  schedule:
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  cocotb:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install iverilog
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y iverilog
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python packages (optional)
+        shell: bash
+        run: |
+          pip install -r infra/requirements.txt
+
+      - name: Run all cocotb sims
+        shell: bash
+        env:
+          # If your cocotb setup honors this, it will emit junit XML in each sim dir.
+          COCOTB_RESULTS_FILE: results.xml
+        run: |
+          set -euo pipefail
+
+          mapfile -t ip_dirs < <(find src -path "*/Makefile" -print0 | xargs -0 -n1 dirname | sort -u)
+          if (( ${#ip_dirs[@]} == 0 )); then
+            echo "No sim Makefiles found under src/**/Makefile"
+            exit 1
+          fi
+
+          failed=0
+          for ip_dir in "${ip_dirs[@]}"; do
+            echo "::group::Running $ip_dir"
+            (cd "$ip_dir" && make sim) || failed=1
+            echo "::endgroup::"
+          done
+
+          exit $failed
+
+      - name: Upload DV artifacts (if any)
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dv-artifacts
+          if-no-files-found: warn
+          path: |
+            src/**/sim/**/*.fst
+            src/**/sim/**/*.vcd
+            src/**/sim/**/sim_build/**
+            src/**/sim/**/results.xml
+            src/**/sim/**/output/**
+
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install verilator
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y verilator
+
+      - name: Run verilator lint for all IPs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t ip_dirs < <(find src -path "*/Makefile" -print0 | xargs -0 -n1 dirname | sort -u)
+          if (( ${#ip_dirs[@]} == 0 )); then
+            echo "No IP Makefiles found under src/**/Makefile"
+            exit 1
+          fi
+
+          failed=0
+          for ip_dir in "${ip_dirs[@]}"; do
+            echo "::group::Linting $ip_dir"
+            (cd "$ip_dir" && make lint) || failed=1
+            echo "::endgroup::"
+          done
+
+          exit $failed
+
+  synth:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install yosys
+        shell: bash
+        run: sudo apt-get update && sudo apt-get install -y yosys
+
+      - name: Run yosys synth for all IPs
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t ip_dirs < <(find src -path "*/Makefile" -print0 | xargs -0 -n1 dirname | sort -u)
+          if (( ${#ip_dirs[@]} == 0 )); then
+            echo "No IP Makefiles found under src/**/Makefile"
+            exit 1
+          fi
+
+          failed=0
+          for ip_dir in "${ip_dirs[@]}"; do
+            echo "::group::Synth $ip_dir"
+            (cd "$ip_dir" && make synth) || failed=1
+            echo "::endgroup::"
+          done
+
+          exit $failed
