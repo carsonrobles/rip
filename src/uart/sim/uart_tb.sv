@@ -23,7 +23,8 @@ module uart_tb ();
   logic       tx_o;
 
   uart #(
-    .CLKS_PER_BIT ( 5 )
+    //.CLKS_PER_BIT ( 6875 ) // CLK=66MHz BAUD = 9600
+    .CLKS_PER_BIT ( 868 ) // CLK=100MHz BAUD = 115200
   ) u_dut (
     .clk_i           ( clk_i           ),
     .rst_ni          ( rst_ni          ),
