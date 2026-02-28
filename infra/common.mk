@@ -51,21 +51,21 @@ echo:
 # TODO: for now this calls sim.mk in sim folder, can this be integrated here?
 sim:
 	@echo "==> [$(IP_TOP)] sim"
-	@$(MAKE) -C $(SIM_DIR) -f sim.mk clean
-	@$(MAKE) -C $(SIM_DIR) -f sim.mk
+	$(MAKE) -C $(SIM_DIR) -f sim.mk clean
+	$(MAKE) -C $(SIM_DIR) -f sim.mk
 
 lint:
 	@echo "==> [$(IP_TOP)] lint"
 	$(call assert_files,$(RTL_SOURCES))
 	$(call assert_defined,IP_TOP)
-	@$(VERILATOR) $(VERILATOR_FLAGS) $(VERILATOR_INC) --top-module $(IP_TOP) $(RTL_SOURCES)
+	$(VERILATOR) $(VERILATOR_FLAGS) $(VERILATOR_INC) --top-module $(IP_TOP) $(RTL_SOURCES)
 
 synth:
 	@echo "==> [$(IP_TOP)] synth"
 	$(call assert_files,$(RTL_SOURCES))
 	$(call assert_defined,IP_TOP)
-	@mkdir -p $(YOSYS_OUT_DIR)
-	@$(YOSYS) -p "\
+	mkdir -p $(YOSYS_OUT_DIR)
+	$(YOSYS) -p "\
 		read_verilog -sv $(RTL_SOURCES); \
 		hierarchy -check -top $(IP_TOP); \
 		proc; opt; \
