@@ -15,16 +15,6 @@ abort() {
   return 1 2>/dev/null || exit 1
 }
 
-# Linux-only python-dev check
-if [[ "$(uname -s)" == "Linux" ]]; then
-  if command -v dpkg >/dev/null 2>&1; then
-    if ! dpkg -s python3.11-dev >/dev/null 2>&1; then
-      abort "python3.11-dev is not installed. Run: sudo apt-get install -y python3.11-dev" || return 1
-      # the "|| return 1" makes it unmissable when sourced
-    fi
-  fi
-fi
-
 if ! command -v "$PYTHON" >/dev/null 2>&1; then
   abort "$PYTHON not found." || return 1
 fi
