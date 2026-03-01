@@ -23,5 +23,3 @@ fi
 source ${REPO_ROOT}/.venv/bin/activate || abort "Failed to activate venv" || return 1
 python -m pip install -U pip || abort "pip upgrade failed" || return 1
 pip install -r ${REPO_ROOT}/infra/requirements.txt || abort "requirements install failed" || return 1
-
-source ${REPO_ROOT}/infra/python_path.sh

@@ -31,7 +31,6 @@ jobs:
         shell: bash
         run: |
           pip install -r infra/requirements.txt
-          source ./infra/python_path.sh
 
       - name: Run all cocotb sims
         shell: bash
