@@ -8,6 +8,10 @@
 #
 # And optionally override:
 #   VERILATOR_FLAGS
+REPO_ROOT := $(shell git rev-parse --show-toplevel)
+
+export PYTHONPATH := $(REPO_ROOT)/src/cocotb:$(PYTHONPATH)
+
 RTL_DIR      ?= rtl
 SIM_DIR      ?= sim
 RTL_SOURCES  ?= $(wildcard $(RTL_DIR)/*.sv) $(wildcard $(RTL_DIR)/*.v)

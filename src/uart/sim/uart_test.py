@@ -5,17 +5,17 @@ from cocotb.clock import Clock
 from cocotb.triggers import ClockCycles
 
 
-from uart_cocotb import UartTx
+from cocotb_uart import uart
 
 
 @cocotb.test()
-async def test_project(dut):
+async def smoke(dut):
     dut._log.info("Start")
 
     clock = Clock(dut.clk_i, 10, unit="ns")
     cocotb.start_soon(clock.start())
 
-    uart_tx = UartTx(dut.rx_i, baud=115200)
+    uart_tx = uart.UartTx(dut.rx_i, baud=115200)
 
     dut._log.info("Reset")
 
