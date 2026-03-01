@@ -24,11 +24,4 @@ source ${REPO_ROOT}/.venv/bin/activate || abort "Failed to activate venv" || ret
 python -m pip install -U pip || abort "pip upgrade failed" || return 1
 pip install -r ${REPO_ROOT}/infra/requirements.txt || abort "requirements install failed" || return 1
 
-COCOTB_COMMON_PATH="${REPO_ROOT}/src/cocotb"
-
-if [ ! -d "$COCOTB_COMMON_PATH" ]; then
-  echo "Error: ${COCOTB_COMMON_PATH} does not exist"
-  return 1 2>/dev/null || exit 1
-fi
-
-export PYTHONPATH="${COCOTB_COMMON_PATH}:${PYTHONPATH}"
+source ${REPO_ROOT}/infra/python_path.sh

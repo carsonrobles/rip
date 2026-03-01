@@ -30,7 +30,8 @@ jobs:
       - name: Install Python packages (optional)
         shell: bash
         run: |
-          source ./infra/env.sh
+          pip install -r infra/requirements.txt
+          source ./infra/python_path.sh
 
       - name: Run all cocotb sims
         shell: bash
