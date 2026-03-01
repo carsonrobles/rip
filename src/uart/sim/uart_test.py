@@ -79,7 +79,6 @@ async def smoke(dut):
 
     recv_cnt = 0
     while recv_cnt < len(data):
-        await ClockCycles(dut.clk_i, 1)
         recv = await uart_rx.recv_bytes(1)
         print(f"{recv_cnt+1}/{len(data)}: received byte={hex(recv[0])}, expecting byte {hex(data[recv_cnt])}")
         assert recv[0] == data[recv_cnt] & 0xff
