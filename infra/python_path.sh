@@ -1,3 +1,5 @@
+REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null)
+
 COCOTB_COMMON_PATH="${REPO_ROOT}/src/cocotb"
 
 if [ ! -d "$COCOTB_COMMON_PATH" ]; then
